@@ -29,7 +29,7 @@ class Api_Controller extends MX_Controller {
 		$this->_today = date("Y-m-d H:i:s");
 
 		header('Content-Type: application/json');
-			
+		
 		$this->after_init();
 	}
 
@@ -349,7 +349,7 @@ class Api_Controller extends MX_Controller {
 		);
 	}
 
-	private function validate_parent_auth() {
+	public function validate_parent_auth() {
 		$token_row = $this->get_token();
 		$this->_oauth_bridge_parent_id = $token_row->client_id;
 	}
@@ -744,10 +744,13 @@ class Api_Controller extends MX_Controller {
 		$this->load->model('api/tokens_model', 'tokens');
 
 		$token = get_bearer_token();
-
 		// error code E001
 		if (is_null($token)) {
-			generate_error_message("E001");
+			echo json_encode(array(
+				"error" 	=> true,
+				"message"	=> "Invalid token."
+			));
+			die();
 		}
 
 		$token_row = $this->tokens->get_datum(
@@ -759,7 +762,11 @@ class Api_Controller extends MX_Controller {
 
 		// error code E002
 		if ($token_row == "") {
-			generate_error_message("E002");
+			echo json_encode(array(
+				"error" 	=> true,
+				"message"	=> "Invalid token not found."
+			));
+			die();
 		}
 
 		return $token_row;
