@@ -88,6 +88,9 @@ $route["lookup/provinces/(:num)"]       = "api/Lookup/provinces/$1";
 $route["otp/client/submit"]             = "api/Otp/client_submit";
 $route["otp/client/resend"]             = "api/Otp/client_resend";
 
+// QR Code
+$route["qr-code/client/(:any)"]         = "public/Qr_code/client_accounts/$1";
+
 $route['404_override'] = 'api/Error_404';
 $route['translate_uri_dashes'] = FALSE;
 
