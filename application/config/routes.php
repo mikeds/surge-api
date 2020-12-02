@@ -81,6 +81,8 @@ $route["pastor/lookup/tx"]              = "api/Pastor_lookup/tx";
 $route["pastor/balance"]                = "api/Pastor/balance";
 
 $route["lookup/pastor-list"]            = "api/Lookup/pastor_list";
+$route["lookup/countries"]              = "api/Lookup/countries";
+$route["lookup/provinces/(:num)"]       = "api/Lookup/provinces/$1";
 
 $route['404_override'] = 'api/Error_404';
 $route['translate_uri_dashes'] = FALSE;

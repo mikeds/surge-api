@@ -146,7 +146,10 @@ class Client_registration extends Api_Controller {
 			$this->create_wallet_address($account_number, $bridge_id, $this->_oauth_bridge_parent_id);
 
 			// create token auth for api
-			$this->create_token_auth($account_number, $bridge_id);			
+			$this->create_token_auth($account_number, $bridge_id);
+
+			// send email otp
+			
 
 			echo json_encode(
 				array(

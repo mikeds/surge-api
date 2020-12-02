@@ -15,6 +15,19 @@ class Lookup extends Api_Controller {
     public function pastor_list() {
         $this->load->model("api/pastor_accounts_model", "accounts");
 
+        $like = array();
+
+        if (isset($_GET['q'])) {
+            $query = $_GET['q'];
+            
+            if ($query != "") {
+                $like = array(
+                    'field' => 'CONCAT(account_fname, " ", account_mname, " ", account_lname)',
+                    'value' => $query
+                );
+            }
+        }
+
         $results = $this->accounts->get_data(
             array(
                 'account_number',
@@ -27,7 +40,7 @@ class Lookup extends Api_Controller {
             array(
                 'account_status' => 1
             ),
-            array(),
+            $like,
             array(),
             array(
                 'filter'    => 'account_fname',
@@ -38,6 +51,63 @@ class Lookup extends Api_Controller {
         echo json_encode(
             array(
                 'message'	=> "Successfully fetch pastor accounts!",
+                'timestamp'	=> $this->_today,
+                'response'  => $results
+            )
+        );
+    }
+
+    public function countries() {
+        $this->load->model("api/countries_model", "countries");
+
+        $results = $this->countries->get_data(
+            array(
+                'country_id',
+                'country_name'
+            ),
+            array(
+                'country_status' => 1
+            ),
+            array(),
+            array(),
+            array(
+                'filter'    => 'country_name',
+                'sort'      => 'ASC'
+            )
+        );
+
+        echo json_encode(
+            array(
+                'message'	=> "Successfully fetch Countries!",
+                'timestamp'	=> $this->_today,
+                'response'  => $results
+            )
+        );
+    }
+
+    public function provinces($country_id) {
+        $this->load->model("api/provinces_model", "provinces");
+
+        $results = $this->provinces->get_data(
+            array(
+                'province_id',
+                'province_name'
+            ),
+            array(
+                'province_status'   => 1,
+                'country_id'        => $country_id
+            ),
+            array(),
+            array(),
+            array(
+                'filter'    => 'province_name',
+                'sort'      => 'ASC'
+            )
+        );
+
+        echo json_encode(
+            array(
+                'message'	=> "Successfully fetch Provinces!",
                 'timestamp'	=> $this->_today,
                 'response'  => $results
             )
