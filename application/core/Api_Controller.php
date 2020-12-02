@@ -29,7 +29,7 @@ class Api_Controller extends MX_Controller {
 		$this->_today = date("Y-m-d H:i:s");
 
 		header('Content-Type: application/json');
-		
+			
 		$this->after_init();
 	}
 
@@ -540,19 +540,10 @@ class Api_Controller extends MX_Controller {
 	}
 
 	public function send_email_activation($send_to_email, $pin, $expiration_date = "") {
-		if ($expiration_date != "") {
-			if ($expiration_date > $this->_today) {
-				generate_error_message("E010-2");
-			}
-		}
-
-		$date	= strtotime($this->_today);
-		$date 	= date("F j, Y, g:i a", $date);
-
 		// send email activation
 		$email_message = $this->load->view("templates/email_activation", array(
-			"activation_pin" => $pin,
-			"date"	=> $date
+			"activation_pin" 	=> $pin,
+			"expiration_date"	=> $expiration_date
 		), true);
 
 		send_email(
@@ -730,6 +721,11 @@ class Api_Controller extends MX_Controller {
 
 	public function get_post() {
 		$post = json_decode($this->input->raw_input_stream, true);
+
+		if (count($post) == 0) {
+			return array();
+		}
+
 		return filter_var_array($post, FILTER_SANITIZE_STRING);
 	}
 

@@ -84,6 +84,10 @@ $route["lookup/pastor-list"]            = "api/Lookup/pastor_list";
 $route["lookup/countries"]              = "api/Lookup/countries";
 $route["lookup/provinces/(:num)"]       = "api/Lookup/provinces/$1";
 
+// OTP
+$route["otp/client/submit"]             = "api/Otp/client_submit";
+$route["otp/client/resend"]             = "api/Otp/client_resend";
+
 $route['404_override'] = 'api/Error_404';
 $route['translate_uri_dashes'] = FALSE;
 
