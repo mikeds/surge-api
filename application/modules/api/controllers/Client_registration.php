@@ -169,7 +169,7 @@ class Client_registration extends Api_Controller {
 			// create token auth for api
 			$this->create_token_auth($account_number, $bridge_id);
 
-			// send email otp
+			// send mail
 			$this->send_email_activation(
 				$email_address,
 				$pin,

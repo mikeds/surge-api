@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Otp extends Api_Controller {
 
 	public function after_init() {
-        $this->global_validate_token();
+        // $this->global_validate_token();
 
         if ($_SERVER['REQUEST_METHOD'] != 'POST' && $this->JSON_POST()) {
             // unauthorized access
@@ -17,13 +17,15 @@ class Otp extends Api_Controller {
 
         $post = $this->get_post();
 
-        $otp_pin = isset($post["otp_pin"]) ? $post["otp_pin"] : "";
+        $username   = isset($post["username"]) ? $post["username"] : "";
+        $otp_pin    = isset($post["otp_pin"]) ? $post["otp_pin"] : "";
 
         $row = $this->accounts->get_datum(
             '',
             array(
-                'account_otp_pin'   => $otp_pin,
-                'account_status'    => 0
+                'account_email_address' => $username,
+                'account_otp_pin'       => $otp_pin,
+                'account_status'        => 0
             )
         )->row();
 
@@ -85,7 +87,7 @@ class Otp extends Api_Controller {
             echo json_encode(
                 array(
                     'error'		=> true,
-                    'message'	=> "Invalid OTP Pin!",
+                    'message'	=> "Invalid request otp!",
                     'timestamp'	=> $this->_today
                 )
             );
@@ -100,6 +102,15 @@ class Otp extends Api_Controller {
         $time = new DateTime($this->_today);
         $time->add(new DateInterval('PT' . 3 . 'M'));
         $expiration_date = $time->format('Y-m-d H:i:s');
+
+        // update otp pin
+        $this->accounts->update(
+            $row->account_number,
+            array(
+                'account_otp_pin'           => $pin,
+                'account_otp_expiration'    => $expiration_date
+            )
+        );
 
         // send email otp
         $this->send_email_activation(
