@@ -20,7 +20,7 @@ class Client_registration extends Api_Controller {
 
 			$pastor_id		= isset($post['pastor_id']) ? $post['pastor_id'] : "";
 
-			$password 			= isset($post['password']) ? $post['password'] : "";
+			$password 		= isset($post['password']) ? $post['password'] : "";
 
 			if ($fname == "" || $lname == "" || $email_address == "" || $mobile_no == "" || $password == "" || $dob == "" || $pastor_id == "") {
 				echo json_encode(

@@ -66,6 +66,7 @@ $route["client/lookup/qr-code"]         = "api/Client_lookup/qr_code";
 $route["client/lookup/tx"]              = "api/Client_lookup/tx";
 
 $route["client/balance"]                = "api/Client/balance";
+$route["client/tx-history"]             = "api/Client_tx/history";
 
 // PASTOR
 $route["pastor/login"]                  = "api/Pastor_login";
@@ -79,6 +80,7 @@ $route["pastor/lookup/tx"]              = "api/Pastor_lookup/tx";
 
 $route["pastor/balance"]                = "api/Pastor/balance";
 
+$route["lookup/pastor-list"]            = "api/Lookup/pastor_list";
 
 $route['404_override'] = 'api/Error_404';
 $route['translate_uri_dashes'] = FALSE;

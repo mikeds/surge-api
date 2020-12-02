@@ -37,6 +37,11 @@ class Api_Controller extends MX_Controller {
 		$this->validate_parent_auth();
 	}
 
+	public function global_validate_token() {
+		$this->load->library("oauth2");
+		$this->oauth2->get_resource();
+	}
+
 	public function get_tx_fee($tx_type_id = "") {
 		$this->load->model("api/income_shares_setup_model", "is_setup");
 		$setup_data = $this->is_setup->get_data(
