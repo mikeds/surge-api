@@ -80,8 +80,6 @@ class Otp extends Api_Controller {
                 'account_status'        => 0
             )
         )->row();
-                echo $this->db->last_query();
-                die();
 
         if ($row == "") {
             echo json_encode(
