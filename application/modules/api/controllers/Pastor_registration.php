@@ -2,10 +2,9 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Pastor_registration extends Api_Controller {
-	public function after_init() {}
-
 	public function index() {
 		$this->load->model("api/pastor_accounts_model", "accounts");
+		$this->load->model("api/oauth_bridges_model", "bridges");
 
 		if ($this->JSON_POST() && $_SERVER['REQUEST_METHOD'] == 'POST') {
 			$post = $this->get_post();
@@ -77,7 +76,7 @@ class Pastor_registration extends Api_Controller {
 			$account_number = $this->generate_code(
 				array(
 					"client",
-					$this->_oauth_bridge_parent_id,
+					// $this->_oauth_bridge_parent_id,
 					$email_address,
 					$this->_today
 				),

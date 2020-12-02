@@ -2,11 +2,10 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Client_registration extends Api_Controller {
-	public function after_init() {}
-
 	public function index() {
 		$this->load->model("api/client_accounts_model", "accounts");
 		$this->load->model("api/pastor_accounts_model", "pastor_accounts");
+		$this->load->model("api/oauth_bridges_model", "bridges");
 
 		if ($this->JSON_POST() && $_SERVER['REQUEST_METHOD'] == 'POST') {
 			$post = $this->get_post();
@@ -18,15 +17,22 @@ class Client_registration extends Api_Controller {
 			$dob			= isset($post['dob']) ? $post['dob'] : "";
 			$gender			= isset($post['gender']) ? $post['gender'] : "";
 
+			$house_no		= isset($post['house_no']) ? $post['house_no'] : "";
+			$street			= isset($post['street']) ? $post['street'] : "";
+			$brgy			= isset($post['brgy']) ? $post['brgy'] : "";
+			$city			= isset($post['city']) ? $post['city'] : "";
+			$province_id	= isset($post['province_id']) ? $post['province_id'] : "";
+			$others			= isset($post['others']) ? $post['others'] : "";
+
 			$pastor_id		= isset($post['pastor_id']) ? $post['pastor_id'] : "";
 
 			$password 		= isset($post['password']) ? $post['password'] : "";
 
-			if ($fname == "" || $lname == "" || $email_address == "" || $mobile_no == "" || $password == "" || $dob == "" || $pastor_id == "") {
+			if ($fname == "" || $lname == "" || $email_address == "" || $mobile_no == "" || $password == "" || $dob == "" || $pastor_id == "" || $province_id == "" || $city = "") {
 				echo json_encode(
 					array(
 						'error'		=> true,
-						'message'	=> "Please complete the parameters! Note: [pastor_id, first_name, last_name, mobile_no, email_address, dob, password, confirm_password] are required.",
+						'message'	=> "Please complete the parameters! Note: [pastor_id, first_name, last_name, mobile_no, email_address, dob, password, confirm_password, province_id, city] are required.",
 						'timestamp'	=> $this->_today
 					)
 				);
@@ -99,7 +105,7 @@ class Client_registration extends Api_Controller {
 			$account_number = $this->generate_code(
 				array(
 					"client",
-					$this->_oauth_bridge_parent_id,
+					// $this->_oauth_bridge_parent_id,
 					$email_address,
 					$this->_today
 				),
@@ -116,6 +122,13 @@ class Client_registration extends Api_Controller {
 
 			$password = hash("sha256", $password);
 
+			$pin 	= generate_code(4, 2);
+
+			// generate expiration datetime
+			$time = new DateTime($this->_today);
+			$time->add(new DateInterval('PT' . 3 . 'M'));
+			$expiration_date = $time->format('Y-m-d H:i:s');
+
 			// create account
 			$this->accounts->insert(
 				array(
@@ -129,7 +142,15 @@ class Client_registration extends Api_Controller {
 					'account_email_address'	=> $email_address,
 					'account_dob'			=> $dob,
 					'account_gender'		=> $gender == 'female' ? 2 : 1,
-					'account_date_added'	=> $this->_today
+					'account_date_added'	=> $this->_today,
+					'account_otp_pin'		=> $pin,
+					'account_otp_expiration'=> $expiration_date,
+					'account_house_no'		=> $house_no,
+					'account_street'		=> $street,
+					'account_brgy'			=> $brgy,
+					'account_city'			=> $city,
+					'province_id'			=> $province_id,
+					'account_others'		=> $others,
 				)
 			);
 
@@ -146,7 +167,14 @@ class Client_registration extends Api_Controller {
 			$this->create_wallet_address($account_number, $bridge_id, $this->_oauth_bridge_parent_id);
 
 			// create token auth for api
-			$this->create_token_auth($account_number, $bridge_id);			
+			$this->create_token_auth($account_number, $bridge_id);
+
+			// send email otp
+			$this->send_email_activation(
+				$email_address,
+				$pin,
+				$expiration_date
+			);
 
 			echo json_encode(
 				array(

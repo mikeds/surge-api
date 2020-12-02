@@ -30,8 +30,7 @@ class Client_login extends Api_Controller {
 				'',
 				array(
 					'account_email_address' => $username,
-					'account_password' 		=> $password,
-					'account_status'		=> 1
+					'account_password' 		=> $password
 				),
 				array(),
 				array(
@@ -47,7 +46,6 @@ class Client_login extends Api_Controller {
 				array(
 					'account_mobile_no' => $username,
 					'account_password' 	=> $password,
-					'account_status'	=> 1
 				),
 				array(),
 				array(
@@ -65,6 +63,17 @@ class Client_login extends Api_Controller {
 					array(
 						'error'		=> true,
 						'message'	=> "Incorrect login!",
+						'timestamp'	=> $this->_today
+					)
+				);
+				return;
+			}
+
+			if ($row->account_status != 1) {
+				echo json_encode(
+					array(
+						'error'		=> true,
+						'message'	=> "Account is not yet activated!",
 						'timestamp'	=> $this->_today
 					)
 				);
