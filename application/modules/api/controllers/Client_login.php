@@ -2,8 +2,6 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Client_login extends Api_Controller {
-	public function after_init() {}
-
 	public function index() {
 		$this->load->model("api/client_accounts_model", "accounts");
 

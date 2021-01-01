@@ -29,7 +29,7 @@ class Api_Controller extends MX_Controller {
 		$this->_today = date("Y-m-d H:i:s");
 
 		header('Content-Type: application/json');
-		
+
 		$this->after_init();
 	}
 
@@ -350,8 +350,35 @@ class Api_Controller extends MX_Controller {
 	}
 
 	public function validate_parent_auth() {
+		$this->global_validate_token();
+		
+		$this->load->model("api/oauth_bridges_model", "bridges");
+
 		$token_row = $this->get_token();
-		$this->_oauth_bridge_parent_id = $token_row->client_id;
+
+		$admin_oauth_bridge_id = $token_row->client_id;
+
+		$row = $this->bridges->get_datum(
+			'',
+			array(
+				'oauth_bridges.oauth_bridge_id' => $admin_oauth_bridge_id
+			),
+			array(),
+			array(
+				array(
+					'table_name' 	=> 'admins',
+					'condition'		=> 'admins.oauth_bridge_id = oauth_bridges.oauth_bridge_id'
+				)
+			)
+		)->row();
+
+		if ($row == "") {
+			// unauthorized access
+			$this->output->set_status_header(401);	
+			die();
+		}
+
+		$this->_oauth_bridge_parent_id = $admin_oauth_bridge_id;
 	}
 
 	public function validate_email($email_address, $not_id = "") {
