@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Otp extends Api_Controller {
 
 	public function after_init() {
-        // $this->global_validate_token();
+        $this->global_validate_token();
 
         if ($_SERVER['REQUEST_METHOD'] != 'POST' && $this->JSON_POST()) {
             // unauthorized access
