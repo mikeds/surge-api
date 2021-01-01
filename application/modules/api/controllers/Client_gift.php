@@ -5,6 +5,8 @@ class Client_gift extends Client_Controller {
 	public function after_init() {}
 
 	public function send() {
+		$this->load->model("api/branches_model", "branches");
+
 		$legder_desc 	= "cash_in";
 		$tx_type_id 	= "cashin1";
 		$tx_limits 		= $this->get_tx_limit($tx_type_id);
@@ -16,6 +18,32 @@ class Client_gift extends Client_Controller {
 
 			$amount			= isset($post['amount']) ? $post['amount'] : "";
 			$note			= isset($post['note']) ? $post['note'] : "";
+			$branch_no		= isset($post['branch_no']) ? $post['branch_no'] : "";
+
+			$row = $this->branches->get_datum(
+				'',
+				array(
+					'cbranch_number' => $branch_no
+				),
+				array(),
+				array(
+					array(
+						"table_name"	=> "wallet_addresses",
+						"condition"		=> "wallet_addresses.oauth_bridge_id = church_branches.oauth_bridge_id",
+					)
+				)
+			)->row();
+
+			if ($row == "") {
+				echo json_encode(
+					array(
+						'error'		=> true,
+						'message'	=> "Invalid Branch no.",
+						'timestamp'	=> $this->_today
+					)
+				);
+				return;
+			}
 
 			if (!is_numeric($amount)) {
 				echo json_encode(
@@ -39,18 +67,20 @@ class Client_gift extends Client_Controller {
 				return;
 			}
 
-			if ($amount < $min) {
-				echo json_encode(
-					array(
-						'error'		=> true,
-						'message'	=> "Invalid Amount, Minimun amount is {$min}!",
-						'timestamp'	=> $this->_today
-					)
-				);
-				return;
-			}
+			// if ($amount < $min) {
+			// 	echo json_encode(
+			// 		array(
+			// 			'error'		=> true,
+			// 			'message'	=> "Invalid Amount, Minimun amount is {$min}!",
+			// 			'timestamp'	=> $this->_today
+			// 		)
+			// 	);
+			// 	return;
+			// }
 
-			$fee = $this->get_tx_fee($tx_type_id);
+			// $fee = $this->get_tx_fee($tx_type_id);
+
+			$fee = 0;
 
 			if ($amount < $fee) {
 				echo json_encode(
@@ -65,6 +95,7 @@ class Client_gift extends Client_Controller {
 
 			// tx logic
 			$tx_by = $this->_oauth_bridge_id;
+			$tx_to = $row->oauth_bridge_id;
 
 			// calculate receiving fee
 			$receiving_amount = ($amount - $fee);
@@ -74,13 +105,26 @@ class Client_gift extends Client_Controller {
 				$fee, 
 				$tx_type_id, 
 				$tx_by, 
-				"",
+				$tx_to,
 				$tx_by,
 				60,
 				$note
 			);
 
+			$transaction_id	= $tx_row['transaction_id'];
 			$sender_ref_id  = $tx_row['sender_ref_id'];
+
+			$debit_oauth_bridge_id 	= $tx_by;
+			$credit_oauth_bridge_id = $tx_to;
+
+			$this->create_ledger(
+				$legder_desc, 
+				$transaction_id, 
+				$receiving_amount, 
+				$fee,
+				$debit_oauth_bridge_id, 
+				$credit_oauth_bridge_id
+			);
 
 			echo json_encode(
 				array(

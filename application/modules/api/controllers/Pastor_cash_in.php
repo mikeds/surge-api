@@ -104,7 +104,7 @@ class Pastor_cash_in extends Pastor_Controller {
 				)
 			);
 
-			$this->setup_income_shares($row->transaction_id);
+			// $this->setup_income_shares($row->transaction_id);
 
 			echo json_encode(
 				array(

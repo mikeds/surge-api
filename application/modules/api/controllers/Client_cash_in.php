@@ -50,18 +50,20 @@ class Client_cash_in extends Client_Controller {
 				return;
 			}
 
-			$fee = $this->get_tx_fee($tx_type_id);
+			$fee = 0; // set default
 
-			if ($amount < $fee) {
-				echo json_encode(
-					array(
-						'error'		=> true,
-						'message'	=> "Invalid Amount, amount is not enough to cover the fees!",
-						'timestamp'	=> $this->_today
-					)
-				);
-				return;
-			}
+			// $fee = $this->get_tx_fee($tx_type_id);
+
+			// if ($amount < $fee) {
+			// 	echo json_encode(
+			// 		array(
+			// 			'error'		=> true,
+			// 			'message'	=> "Invalid Amount, amount is not enough to cover the fees!",
+			// 			'timestamp'	=> $this->_today
+			// 		)
+			// 	);
+			// 	return;
+			// }
 
 			// tx logic
 			$tx_by = $this->_oauth_bridge_id;
