@@ -49,15 +49,17 @@ class Lookup extends Api_Controller {
         );
 
         $results = array_merge(
-            $results,
             array(
-                'account_number'        => '0',
-                'account_fname'         => 'I just researched by myself',
-                'account_mname'         => '',
-                'account_lname'         => '',
-                'account_email_address' => '',
-                'account_mobile_no'     => '',
-            )
+                array(
+                    'account_number'        => '0',
+                    'account_fname'         => 'I just researched by myself',
+                    'account_mname'         => '',
+                    'account_lname'         => '',
+                    'account_email_address' => '',
+                    'account_mobile_no'     => '',
+                )
+            ),
+            $results
         );
         
         echo json_encode(
