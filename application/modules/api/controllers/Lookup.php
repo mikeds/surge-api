@@ -48,9 +48,63 @@ class Lookup extends Api_Controller {
             )
         );
 
+        $results = array_merge(
+            $results,
+            array(
+                'account_number'        => '0',
+                'account_fname'         => 'I just researched by myself',
+                'account_mname'         => '',
+                'account_lname'         => '',
+                'account_email_address' => '',
+                'account_mobile_no'     => '',
+            )
+        );
+        
         echo json_encode(
             array(
                 'message'	=> "Successfully fetch pastor accounts!",
+                'timestamp'	=> $this->_today,
+                'response'  => $results
+            )
+        );
+    }
+
+    public function church_branches() {
+        $this->load->model("api/church_branches_model", "branches");
+
+        $like = array();
+
+        if (isset($_GET['q'])) {
+            $query = $_GET['q'];
+            
+            if ($query != "") {
+                $like = array(
+                    'field' => 'CONCAT(cbranch_mobile_no, " ", cbranch_email_address)',
+                    'value' => $query
+                );
+            }
+        }
+
+        $results = $this->branches->get_data(
+            array(
+                'cbranch_number as branch_no',
+                'cbranch_mobile_no as mobile_no',
+                'cbranch_email_address as email_address'
+            ),
+            array(
+                'cbranch_status' => 1
+            ),
+            $like,
+            array(),
+            array(
+                'filter'    => 'cbranch_email_address',
+                'sort'      => 'ASC'
+            )
+        );
+
+        echo json_encode(
+            array(
+                'message'	=> "Successfully fetch branches!",
                 'timestamp'	=> $this->_today,
                 'response'  => $results
             )

@@ -81,6 +81,7 @@ $route["pastor/lookup/tx"]              = "api/Pastor_lookup/tx";
 $route["pastor/balance"]                = "api/Pastor/balance";
 
 $route["lookup/pastor-list"]            = "api/Lookup/pastor_list";
+$route["lookup/church-branches"]        = "api/Lookup/church_branches";
 $route["lookup/countries"]              = "api/Lookup/countries";
 $route["lookup/provinces/(:num)"]       = "api/Lookup/provinces/$1";
 
