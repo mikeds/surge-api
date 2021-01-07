@@ -7,8 +7,8 @@ class Client_gift extends Client_Controller {
 	public function send() {
 		$this->load->model("api/branches_model", "branches");
 
-		$legder_desc 	= "cash_in";
-		$tx_type_id 	= "cashin1";
+		$legder_desc 	= "gift";
+		$tx_type_id 	= "gift1";
 		$tx_limits 		= $this->get_tx_limit($tx_type_id);
 		$min			= $tx_limits["min"];
 		$max			= $tx_limits["max"];
