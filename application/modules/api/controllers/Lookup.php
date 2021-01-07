@@ -90,6 +90,7 @@ class Lookup extends Api_Controller {
         $results = $this->branches->get_data(
             array(
                 'cbranch_number as branch_no',
+                'cbranch_name as branch_name',
                 'cbranch_mobile_no as mobile_no',
                 'cbranch_email_address as email_address'
             ),
