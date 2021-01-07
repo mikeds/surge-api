@@ -91,7 +91,7 @@ class Client_registration extends Api_Controller {
 				)
 			)->row();
 
-			if ($pastor_row == "") {
+			if ($pastor_row == "" && $pastor_id != "0") {
 				echo json_encode(
 					array(
 						'error'		=> true,
