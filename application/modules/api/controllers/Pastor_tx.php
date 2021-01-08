@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Client_tx extends Client_Controller {
+class Pastor_tx extends Pastor_Controller {
 	public function after_init() {}
 
 	public function history() {

@@ -77,6 +77,7 @@ $route["pastor/cash-in/accept"]         = "api/Pastor_cash_in/accept";
 $route["pastor/top-up/request"]         = "api/Pastor_top_up/request";
 
 $route["pastor/lookup/tx"]              = "api/Pastor_lookup/tx";
+$route["pastor/tx-history"]             = "api/Pastor_tx/history";
 
 $route["pastor/balance"]                = "api/Pastor/balance";
 
