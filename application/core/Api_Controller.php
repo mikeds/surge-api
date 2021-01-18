@@ -920,5 +920,73 @@ class Api_Controller extends MX_Controller {
 			),
 			'errors' => $error_uploads
 		);
-    }
+	}
+	
+	public function get_oauth_info($oauth_bridge_id) {
+		$this->load->model("api/client_accounts_model", "clients");
+		$this->load->model("api/pastor_accounts_model", "pastors");
+		$this->load->model("api/church_branches_model", "branches");
+		$this->load->model("api/admins_model", "admins");
+
+		$client_row = $this->clients->get_datum(
+			'',
+			array(
+				'oauth_bridge_id' => $oauth_bridge_id
+			)
+		)->row();
+
+		if ($client_row != "") {
+			return array(
+				'name' => "{$client_row->account_fname} {$client_row->account_mname} {$client_row->account_lname}"
+			);
+		}
+
+		$pastor_row = $this->pastors->get_datum(
+			'',
+			array(
+				'oauth_bridge_id' => $oauth_bridge_id
+			)
+		)->row();
+
+		if ($pastor_row != "") {
+			return array(
+				'name' => "{$pastor_row->account_fname} {$pastor_row->account_mname} {$pastor_row->account_lname}"
+			);
+		}
+
+		$branch_row = $this->branches->get_datum(
+			'',
+			array(
+				'oauth_bridge_id' => $oauth_bridge_id
+			)
+		)->row();
+
+		if ($branch_row != "") {
+			return array(
+				'name' => $branch_row->cbranch_name
+			);
+		}
+
+		$admin_row = $this->admins->get_datum(
+			'',
+			array(
+				'oauth_bridge_id' => $oauth_bridge_id
+			)
+		)->row();
+
+		if ($admin_row != "") {
+			return array(
+				'name' => $admin_row->admin_name
+			);
+		}
+
+		return false;
+	}
+
+	public function get_pagination_offset($page = 1, $limit = 10, $num_rows = 10) {
+		$page 	= ($page < 1 ? 1 : $page);
+		$offset = ($page - 1) * $limit;
+		$offset = ($offset >= $num_rows && $page == 1 ? 0 : $offset);
+		return $offset;
+	}
 }
