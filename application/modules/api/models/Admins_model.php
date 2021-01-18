@@ -1,12 +1,12 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Transactions_model extends CI_Model {
+class Admins_model extends CI_Model {
 	private 
-		$_table	= 'transactions  transactions',
-		$_table_x	= 'transactions';
+		$_table	= 'admins  admins',
+		$_table_x	= 'admins';
 
 	private
-		$_id = "transaction_id";
+		$_id = "admin_number";
 
 	function get_datum($id = '', $data = array(), $where_or = array(), $inner_joints = array()) {
 		$this->db->from($this->_table);
@@ -95,57 +95,6 @@ class Transactions_model extends CI_Model {
 
 	}
 
-	function get_data_or( $select = array('*'), $data = array(), $or= array(), $inner_joints = array(), $order_by = array(), $offset = 0, $limit = 0, $group_by = '' ) {
-		
-		$this->db->select(ARRtoSTR($select),false);
-
-		$this->db->from( $this->_table );
-
-		if (!empty($inner_joints)) {
-			foreach($inner_joints as $join) {
-				if (isset($join['type'])) {
-					$this->db->join(
-						$join['table_name'],
-						$join['condition'],
-						$join['type']
-					);
-				} else {
-					$this->db->join(
-						$join['table_name'],
-						$join['condition']
-					);
-				}
-			}
-		}
-
-		if(!empty($data)){
-			$this->db->where($data);
-		}
-
-		if(!empty( $or )){
-		$this->db->or_where($or);
-		}
-
-		if(!empty($limit)){
-			$this->db->limit($limit, $offset);
-		}
-		
-		if( !empty( $order_by ) ) {
-			$this->db->order_by( $order_by['filter'],$order_by['sort'] );
-		}
-
-		if( $group_by != '' ) {
-			$this->db->group_by( $group_by );
-		}
-
-		$query = $this->db->get();
-
-		$results = $query->result_array();
-
-		return $results;
-
-	}
-
 	function get_count( $data = array(), $like = array(), $inner_joints = array(), $order_by = array(), $offset = 0, $count = 0 ) {
 		if( !empty($data) ){
 			
@@ -174,50 +123,6 @@ class Transactions_model extends CI_Model {
 
 			if(!empty( $like )){
 			$this->db->like( $like['field'], $like['value'] );
-			}   
-
-			if( !empty( $count ) ) {
-				$this->db->limit( $count, $offset );
-			}
-			
-			if( !empty( $order_by ) ) {
-				$this->db->order_by( $order_by['filter'],$order_by['sort'] );
-			}
-								
-			return $this->db->count_all_results();
-		}else{
-			return $this->db->count_all($this->_table_x);
-		}
-	}
-
-	function get_count_or( $data = array(), $or = array(), $inner_joints = array(), $order_by = array(), $offset = 0, $count = 0 ) {
-		if( !empty($data) ){
-			
-			$this->db->from($this->_table);
-
-			if (!empty($inner_joints)) {
-				foreach($inner_joints as $join) {
-					if (isset($join['type'])) {
-						$this->db->join(
-							$join['table_name'],
-							$join['condition'],
-							$join['type']
-						);
-					} else {
-						$this->db->join(
-							$join['table_name'],
-							$join['condition']
-						);
-					}
-				}
-			}
-
-			if( !empty( $data ) ) {
-				$this->db->where( $data );
-			}
-
-			if(!empty( $or )){
-				$this->db->or_where($or);
 			}   
 
 			if( !empty( $count ) ) {
