@@ -87,8 +87,8 @@ $route["lookup/countries"]              = "api/Lookup/countries";
 $route["lookup/provinces/(:num)"]       = "api/Lookup/provinces/$1";
 
 // OTP
-$route["otp/client/submit"]             = "api/Otp/client_submit";
-$route["otp/client/resend"]             = "api/Otp/client_resend";
+$route["otp/client/submit"]             = "api/Otp_client_registration/submit";
+$route["otp/client/resend"]             = "api/Otp_client_registration/resend";
 
 // QR Code
 $route["qr-code/client/(:any)"]         = "public/Qr_code/client_accounts/$1";
