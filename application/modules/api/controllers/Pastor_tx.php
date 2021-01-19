@@ -12,6 +12,7 @@ class Pastor_tx extends Pastor_Controller {
 
 			$limit 	= $this->_limit;
 			$page	= 1;
+			$sort	= 'DESC';
 
 			if (isset($_GET['limit'])) {
 				$limit = is_numeric($_GET['limit']) ? $_GET['limit'] : $this->_limit;
@@ -19,6 +20,10 @@ class Pastor_tx extends Pastor_Controller {
 
 			if (isset($_GET['page'])) {
 				$page = is_numeric($_GET['page']) ? $_GET['page'] : 1;
+			}
+
+			if (isset($_GET['sort'])) {
+				$sort = $_GET['sort'] == 'ASC' ? 'ASC' : 'DESC';
 			}
 
 			$select = array(
@@ -58,6 +63,7 @@ left join pastor_accounts as c2
 on tx.transaction_requested_to = c2.oauth_bridge_id
 where
 $query
+ORDER BY transaction_date_created $sort
 $query_limit
 SQL;
 	
