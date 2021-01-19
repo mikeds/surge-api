@@ -1,18 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Otp extends Api_Controller {
-
-	public function after_init() {
-        $this->global_validate_token();
-
-        if ($_SERVER['REQUEST_METHOD'] != 'POST' && $this->JSON_POST()) {
-            // unauthorized access
-		    $this->output->set_status_header(401);	
-        }
-    }
-
-    public function client_submit() {
+class Otp_client_registration extends Api_Controller {
+    public function submit() {
+        $this->load->model("api/client_pre_registration_model", "client_pre_registration");
+        $this->load->model("api/oauth_bridges_model", "bridges");
         $this->load->model("api/client_accounts_model", "accounts");
 
         $post = $this->get_post();
@@ -20,7 +12,7 @@ class Otp extends Api_Controller {
         $username   = isset($post["username"]) ? $post["username"] : "";
         $otp_pin    = isset($post["otp_pin"]) ? $post["otp_pin"] : "";
 
-        $row = $this->accounts->get_datum(
+        $row = $this->client_pre_registration->get_datum(
             '',
             array(
                 'account_email_address' => $username,
@@ -40,7 +32,7 @@ class Otp extends Api_Controller {
             return;
         }
 
-        $expiration_date = $row->account_otp_expiration;
+        $expiration_date = $row->account_otp_expiration_date;
 
         if (strtotime($this->_today) > strtotime($expiration_date)) {
             echo json_encode(
@@ -53,12 +45,57 @@ class Otp extends Api_Controller {
             return;
         }
 
-        $this->accounts->update(
-            $row->account_number,
+        $bridge_id = $this->generate_code(
             array(
-                'account_status' => 1
+                "client",
+                $row->account_number,
+                $this->_today
             )
         );
+
+        $account_number = $row->account_number;
+
+        // create account
+        $this->accounts->insert(
+            array(
+                'pastor_account_number'	=> $row->pastor_account_number,
+                'account_number'		=> $account_number,
+                'oauth_bridge_id'		=> $bridge_id,
+                'account_fname'			=> $row->account_fname,
+                'account_lname'			=> $row->account_lname,
+                'account_mobile_no'		=> $row->account_mobile_no,
+                'account_password'		=> $row->account_password,
+                'account_email_address'	=> $row->account_email_address,
+                'account_dob'			=> $row->account_dob,
+                'account_gender'		=> $row->account_gender,
+                'account_date_added'	=> $this->_today,
+                'account_house_no'		=> $row->account_house_no,
+                'account_street'		=> $row->account_street,
+                'account_brgy'			=> $row->account_brgy,
+                'account_city'			=> $row->account_city,
+                'province_id'			=> $row->province_id,
+                'account_others'		=> $row->account_others,
+                'account_status'        => 1 // activated
+            )
+        );
+
+        // delete from pre registration
+        $this->client_pre_registration->delete($account_number);
+
+        // create bridge access
+        $this->bridges->insert(
+            array(
+                'oauth_bridge_id' 			=> $bridge_id,
+                'oauth_bridge_parent_id'	=> $this->_oauth_bridge_parent_id,
+                'oauth_bridge_date_added'	=> $this->_today
+            )
+        );
+
+        // create wallet address
+        $this->create_wallet_address($account_number, $bridge_id, $this->_oauth_bridge_parent_id);
+
+        // create token auth for api
+        $this->create_token_auth($account_number, $bridge_id);
 
         echo json_encode(
             array(
@@ -68,14 +105,15 @@ class Otp extends Api_Controller {
         );
     }
 
-    public function client_resend() {
+    public function resend() {
+        $this->load->model("api/client_pre_registration_model", "client_pre_registration");
         $this->load->model("api/client_accounts_model", "accounts");
 
         $post = $this->get_post();
 
         $username = isset($post["username"]) ? $post["username"] : "";
 
-        $row = $this->accounts->get_datum(
+        $row = $this->client_pre_registration->get_datum(
             '',
             array(
                 'account_email_address' => $username,
@@ -104,11 +142,11 @@ class Otp extends Api_Controller {
         $expiration_date = $time->format('Y-m-d H:i:s');
 
         // update otp pin
-        $this->accounts->update(
+        $this->client_pre_registration->update(
             $row->account_number,
             array(
-                'account_otp_pin'           => $pin,
-                'account_otp_expiration'    => $expiration_date
+                'account_otp_pin'               => $pin,
+                'account_otp_expiration_date'   => $expiration_date
             )
         );
 

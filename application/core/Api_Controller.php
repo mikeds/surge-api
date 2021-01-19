@@ -381,12 +381,50 @@ class Api_Controller extends MX_Controller {
 		$this->_oauth_bridge_parent_id = $admin_oauth_bridge_id;
 	}
 
-	public function validate_email($email_address, $not_id = "") {
+	public function validate_email_address($email_address, $not_id = "") {
 		$this->load->model("api/pastor_accounts_model", "pastor_accounts");
 		$this->load->model("api/client_accounts_model", "client_accounts");
 
 		$where = array(
 			'account_email_address'	=> $email_address
+		);
+
+		if ($not_id != "") {
+			$where = array_merge(
+				$where,
+				array(
+					'account_number !=' => $not_id
+				)
+			);
+		}
+
+		$row = $this->client_accounts->get_datum(
+			'',
+			$where
+		)->row();
+
+		if ($row != "") {
+			return true;
+		}
+		
+		$row = $this->pastor_accounts->get_datum(
+			'',
+			$where
+		)->row();
+
+		if ($row != "") {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function validate_mobile_no($mobile_no, $not_id = "") {
+		$this->load->model("api/pastor_accounts_model", "pastor_accounts");
+		$this->load->model("api/client_accounts_model", "client_accounts");
+
+		$where = array(
+			'account_mobile_no'	=> $mobile_no
 		);
 
 		if ($not_id != "") {
@@ -576,7 +614,7 @@ class Api_Controller extends MX_Controller {
 		send_email(
 			getenv("SMTPUSER"),
 			$send_to_email,
-			"Email Activation PIN",
+			"Account Registration Activation PIN",
 			$email_message
 		);
 	}
