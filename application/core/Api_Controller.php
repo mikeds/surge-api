@@ -1027,4 +1027,33 @@ class Api_Controller extends MX_Controller {
 		$offset = ($offset >= $num_rows && $page == 1 ? 0 : $offset);
 		return $offset;
 	}
+
+	private function paynet_instapay_submit($tx_id, $bank_code, $acc_no, $acc_name, $note, $amount) {
+		$amount = number_format($amount, 2, '.', '');
+
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+		CURLOPT_URL => PAYNET_BASE_URL .'cx/txn/banktransfer/submit',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS => 'bankCode='. $bank_code .'&accountNumber=' . $acc_no . '&accountName=' . $acc_name . '&txnNote='. $note .'&txnControlId='. $tx_id .'&sourceAmount=' . $amount,
+		CURLOPT_HTTPHEADER => array(
+			'Content-Type: application/x-www-form-urlencoded'
+		),
+		));
+
+		$response = curl_exec($curl);
+		$response = json_decode($response);
+
+		curl_close($curl);
+
+		print_r($response);
+		die();
+	}
 }
