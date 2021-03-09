@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Client_cash_out_paynet extends Client_Controller {
 	public function after_init() {}
 
-	public function request() {
+	public function instapay() {
 		$legder_desc 	= "cash_out";
 		$tx_type_id 	= "cashout2";
 		$tx_limits 		= $this->get_tx_limit($tx_type_id);
@@ -15,6 +15,7 @@ class Client_cash_out_paynet extends Client_Controller {
 			$post = $this->get_post();
 
 			$amount			= isset($post['amount']) ? $post['amount'] : "";
+			$note			= isset($post['note']) ? $post['note'] : "";
 
 			if (!is_numeric($amount)) {
 				echo json_encode(
@@ -82,14 +83,47 @@ class Client_cash_out_paynet extends Client_Controller {
 				$note
 			);
 
+			$tx_id  		= $tx_row['transaction_id'];
 			$sender_ref_id  = $tx_row['sender_ref_id'];
 
 			// paynet request
-			
+			$bank_code = "ALL";
+			$acc_no = "0000000000000001";
+			$acc_fname = "Marknel";
+			$acc_lname = "Pineda";
+	
+			$response = $this->paynet_instapay(
+				$bank_code, 
+				$acc_no, 
+				$acc_fname, 
+				$acc_lname, 
+				$note, 
+				$receiving_amount
+			);
+	
+			if (!isset($response['txn_id'])) {
+				echo json_encode(
+					array(
+						'error'		=> true,
+						'message'	=> isset($response['error_message']) ? $response['error_message'] : "Api gayeway error, Please try again!",
+						'timestamp'	=> $this->_today
+					)
+				);
+				return;
+			}
+
+			$txn_id = $response['txn_id'];
+
+			$this->transactions->update(
+				$tx_id,
+				array(
+					'txn_id' => $txn_id
+				)
+			);
 
 			echo json_encode(
 				array(
-					'message'	=> "Successfully requested cash-out paynet!",
+					'message'	=> "Successfully requested cash-out via paynet!",
 					'response' => array(
 						'ref_id' 	=> $sender_ref_id,
 						'amount' 	=> $amount,

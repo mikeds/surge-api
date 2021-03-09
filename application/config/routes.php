@@ -54,8 +54,8 @@ $route["default_controller"]        = "api/Home";
 $route["token"]                     = "api/Token";
 
 #PAYNET
-$route["token/paynet"]                  = "api/Token/paynet";
-
+$route["token/paynet"]                              = "api/Token/paynet";
+$route["client/cash-out/paynet-instapay"]           = "api/Client_cash_out_paynet/instapay";
 
 // CLIENT
 $route["client/login"]                  = "api/Client_login";
