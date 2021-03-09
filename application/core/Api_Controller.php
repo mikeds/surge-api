@@ -1027,4 +1027,157 @@ class Api_Controller extends MX_Controller {
 		$offset = ($offset >= $num_rows && $page == 1 ? 0 : $offset);
 		return $offset;
 	}
+
+	public function paynet_instapay($bank_code, $acc_no, $acc_fname, $acc_lname, $note, $amount) {
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+		CURLOPT_URL => PAYNET_BASE_URL .'cx/login',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_HEADER => 1,
+		CURLOPT_VERBOSE => 1,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS => 'loginId='. PAYNET_USERNAME .'&loginPass='. PAYNET_PASSWORD .'&loginHost=' . PAYNET_HOST,
+		CURLOPT_HTTPHEADER => array(
+			'Content-Type: application/x-www-form-urlencoded'
+		),
+		));
+
+		$response = curl_exec($curl);
+
+		// close curl
+		curl_close($curl);
+
+		$parts = explode("\r\n\r\nHTTP/", $response);
+		$parts = (count($parts) > 1 ? 'HTTP/' : '').array_pop($parts);
+		list($headers, $body) = explode("\r\n\r\n", $parts, 2);
+
+		
+		// get cookies
+		$cookies = array();
+		preg_match_all('/Set-Cookie:(?<cookie>\s{0,}.*)$/im', $headers, $cookies);
+
+		$cookie = "";
+
+		if (isset($cookies['cookie'])) {
+			if (isset($cookies['cookie'][0])) {
+				$tmp_cookie = explode(";", $cookies['cookie'][0]);
+				$cookie = isset($tmp_cookie[0]) ? $tmp_cookie[0] : "";
+			}
+		}
+
+		// get token auth
+		$response = json_decode($body);
+		$token_auth = isset($response->tokenId) ? $response->tokenId : "";
+
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+		CURLOPT_URL =>  PAYNET_BASE_URL . 'cx/txn/banktransfer/init',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS => array('type' => 'OTC_ONLINE'),
+		CURLOPT_HTTPHEADER => array(
+			"vmicx-authz: {$token_auth}",
+			"Cookie: " . $cookie
+		),
+		));
+
+		$response = curl_exec($curl);
+
+		curl_close($curl);
+		
+		// get tx id
+		$response = json_decode($response);
+		$tx_id = isset($response->txnControlId) ? $response->txnControlId : "";
+
+		// create request
+		$amount = number_format($amount, 2, '.', '');
+
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+		CURLOPT_URL => PAYNET_BASE_URL .'cx/txn/banktransfer/submit',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS => 'bankCode='. $bank_code .'&accountNumber=' . $acc_no . '&accountFirstName=' . $acc_fname . '&accountLastName=' . $acc_lname . '&txnNote='. $note .'&txnControlId='. $tx_id .'&sourceAmount=' . $amount,
+		CURLOPT_HTTPHEADER => array(
+			'Content-Type: application/x-www-form-urlencoded',
+			"vmicx-authz: {$token_auth}",
+			"Cookie: " . $cookie
+		),
+		));
+
+		$response = curl_exec($curl);
+		
+		curl_close($curl);
+
+		// get final tx id
+		$response = json_decode($response);
+		$tx_entity_id = isset($response->entityId) ? $response->entityId : false;
+
+		if (!$tx_entity_id) {
+			return array(
+				'error' => true,
+				'error_message' => isset($response->msgText) ? $response->msgText : "API gateway error!"
+			);
+		}
+
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+		CURLOPT_URL =>  PAYNET_BASE_URL . 'cx/txn/banktransfer/confirm',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS => 'txnControlId=' . $tx_id,
+		CURLOPT_HTTPHEADER => array(
+			'Content-Type: application/x-www-form-urlencoded',
+			"vmicx-authz: {$token_auth}",
+			"Cookie: " . $cookie
+		),
+		));
+
+		$response = curl_exec($curl);
+		
+		curl_close($curl);
+
+		// get final tx id
+		$response = json_decode($response);
+		$txn_id = isset($response->txnId) ? ($response->txnId != 0 ? $response->txnId : false) : false;
+
+		if (!$txn_id) {
+			return array(
+				'error' => true,
+				'error_message' => isset($response->msgText) ? $response->msgText : "API gateway error!"
+			);
+		}
+
+		return array(
+			'txn_id' => $txn_id
+		);
+	}
+
+	private function paynet_status($tx_id) {
+
+	}
 }
