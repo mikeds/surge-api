@@ -1262,6 +1262,161 @@ class Api_Controller extends MX_Controller {
 		return $results;
 	}
 
+	public function paynet_banks() {
+		$results = array(
+			array(
+				'bank_code' => "ALL",
+				'bank_name'	=> "Allied Bank"
+			),
+			array(
+				'bank_code' => "ASB",
+				'bank_name'	=> "Allied Savings Bank"
+			),
+			array(
+				'bank_code' => "AUB",
+				'bank_name'	=> "Asia United Bank"
+			),
+			array(
+				'bank_code' => "BF",
+				'bank_name'	=> "Banco Filipino"
+			),
+			array(
+				'bank_code' => "BSJ",
+				'bank_name'	=> "Banco San Juan"
+			),
+			array(
+				'bank_code' => "CBC",
+				'bank_name'	=> "Chinabank"
+			),
+			array(
+				'bank_code' => "CBI",
+				'bank_name'	=> "Centennial Savings Bank"
+			),
+			array(
+				'bank_code' => "CBS",
+				'bank_name'	=> "Chinabank Savings"
+			),
+			array(
+				'bank_code' => "CCB",
+				'bank_name'	=> "Chinatrust Bank"
+			),
+			array(
+				'bank_code' => "CSB",
+				'bank_name'	=> "Citystate Savings Bank"
+			),
+			array(
+				'bank_code' => "CSI",
+				'bank_name'	=> "Citibank Savings"
+			),
+			array(
+				'bank_code' => "CTB",
+				'bank_name'	=> "Citibank"
+			),
+			array(
+				'bank_code' => "DBP",
+				'bank_name'	=> "DBP"
+			),
+			array(
+				'bank_code' => "EIB",
+				'bank_name'	=> "Export and Industry Bank"
+			),
+			array(
+				'bank_code' => "EWB",
+				'bank_name'	=> "East West Bank"
+			),
+			array(
+				'bank_code' => "LBP",
+				'bank_name'	=> "Landbank"
+			),
+			array(
+				'bank_code' => "MBC",
+				'bank_name'	=> "Manila Bank"
+			),
+			array(
+				'bank_code' => "MET",
+				'bank_name'	=> "Metrobank"
+			),
+			array(
+				'bank_code' => "MPI",
+				'bank_name'	=> "MayBank"
+			),
+			array(
+				'bank_code' => "MSB",
+				'bank_name'	=> "Malayan Bank"
+			),
+			array(
+				'bank_code' => "OMB",
+				'bank_name'	=> "OK Bank"
+			),
+			array(
+				'bank_code' => "PBB",
+				'bank_name'	=> "Philippine Business Bank"
+			),
+			array(
+				'bank_code' => "PBC",
+				'bank_name'	=> "PBCOM"
+			),
+			array(
+				'bank_code' => "PNB",
+				'bank_name'	=> "Philippine National Bank"
+			),
+			array(
+				'bank_code' => "PPB",
+				'bank_name'	=> "Postal Bank"
+			),
+			array(
+				'bank_code' => "PSB",
+				'bank_name'	=> "PSBank"
+			),
+			array(
+				'bank_code' => "PTC",
+				'bank_name'	=> "Philtrust Bank"
+			),
+			array(
+				'bank_code' => "QRB",
+				'bank_name'	=> "QCRB"
+			),
+			array(
+				'bank_code' => "RBI",
+				'bank_name'	=> "Real Bank"
+			),
+			array(
+				'bank_code' => "RBN",
+				'bank_name'	=> "Robinsons Bank"
+			),
+			array(
+				'bank_code' => "RCB",
+				'bank_name'	=> "RCBC"
+			),
+			array(
+				'bank_code' => "RSB",
+				'bank_name'	=> "RCBC Savings Bank"
+			),
+			array(
+				'bank_code' => "SBA",
+				'bank_name'	=> "Sterling Bank"
+			),
+			array(
+				'bank_code' => "SCB",
+				'bank_name'	=> "Standard Chartered Bank"
+			),
+			array(
+				'bank_code' => "SEC",
+				'bank_name'	=> "Security Bank"
+			),
+			array(
+				'bank_code' => "TYB",
+				'bank_name'	=> "TongYang Bank"
+			),
+			array(
+				'bank_code' => "WPB",
+				'bank_name'	=> "World Partners Bank"
+			)
+		);
+
+		return $results;
+	}
+
 	private function paynet_status($tx_id) {
 
 	}
