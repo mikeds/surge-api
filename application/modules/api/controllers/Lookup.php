@@ -13,7 +13,7 @@ class Lookup extends Api_Controller {
     }
 
     public function paynet_instapay_bank_list() {
-        $banks = $this->paynet_instapay_banks();
+        $banks = $this->paynet_banks();
 		echo json_encode($banks);
     }
 
