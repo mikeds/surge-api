@@ -15,6 +15,10 @@ class Client_cash_out_paynet extends Client_Controller {
 			$post = $this->get_post();
 
 			$amount			= isset($post['amount']) ? $post['amount'] : "";
+			$bank_code		= isset($post['bank_code']) ? $post['bank_code'] : "";
+			$acc_no			= isset($post['acc_no']) ? $post['acc_no'] : "";
+			$acc_fname		= isset($post['acc_fname']) ? $post['acc_fname'] : "";
+			$acc_lname		= isset($post['acc_lname']) ? $post['acc_lname'] : "";
 			$note			= isset($post['note']) ? $post['note'] : "";
 
 			if (!is_numeric($amount)) {
@@ -87,11 +91,6 @@ class Client_cash_out_paynet extends Client_Controller {
 			$sender_ref_id  = $tx_row['sender_ref_id'];
 
 			// paynet request
-			$bank_code = "ALL";
-			$acc_no = "0000000000000001";
-			$acc_fname = "Marknel";
-			$acc_lname = "Pineda";
-	
 			$response = $this->paynet_instapay(
 				$bank_code, 
 				$acc_no, 

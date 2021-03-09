@@ -1177,6 +1177,91 @@ class Api_Controller extends MX_Controller {
 		);
 	}
 
+	public function paynet_instapay_banks() {
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+		CURLOPT_URL => PAYNET_BASE_URL .'cx/login',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_HEADER => 1,
+		CURLOPT_VERBOSE => 1,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS => 'loginId='. PAYNET_USERNAME .'&loginPass='. PAYNET_PASSWORD .'&loginHost=' . PAYNET_HOST,
+		CURLOPT_HTTPHEADER => array(
+			'Content-Type: application/x-www-form-urlencoded'
+		),
+		));
+
+		$response = curl_exec($curl);
+
+		// close curl
+		curl_close($curl);
+
+		$parts = explode("\r\n\r\nHTTP/", $response);
+		$parts = (count($parts) > 1 ? 'HTTP/' : '').array_pop($parts);
+		list($headers, $body) = explode("\r\n\r\n", $parts, 2);
+
+		
+		// get cookies
+		$cookies = array();
+		preg_match_all('/Set-Cookie:(?<cookie>\s{0,}.*)$/im', $headers, $cookies);
+
+		$cookie = "";
+
+		if (isset($cookies['cookie'])) {
+			if (isset($cookies['cookie'][0])) {
+				$tmp_cookie = explode(";", $cookies['cookie'][0]);
+				$cookie = isset($tmp_cookie[0]) ? $tmp_cookie[0] : "";
+			}
+		}
+
+		// get token auth
+		$response = json_decode($body);
+		$token_auth = isset($response->tokenId) ? $response->tokenId : "";
+
+		// instapay bank list
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+		CURLOPT_URL => 'newtest.paynet.io/pub/btbanks/php/instapay',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'GET',
+		CURLOPT_HTTPHEADER => array(
+			'vmicx-authz: ' . $token_auth,
+			"Cookie: " . $cookie
+		),
+		));
+
+		$response = curl_exec($curl);
+
+		curl_close($curl);
+		
+		$data = json_decode($response);
+
+		$results = array();
+
+		foreach ($data as $datum) {
+			if (isset($datum->internalBankCode) && isset($datum->bankName)) {
+				$results[] = array(
+					'bank_code'	=> $datum->internalBankCode,
+					'bank_name'	=> $datum->bankName
+				);
+			}
+		}
+
+		return $results;
+	}
+
 	private function paynet_status($tx_id) {
 
 	}
